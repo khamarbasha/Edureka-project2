@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        DOCKER_IMAGE_NAME = "khamar/train-schedule"
+        DOCKER_IMAGE_NAME = "khamarbasha/train-schedule"
     }
     stages {
         stage('Build Docker Image') {
