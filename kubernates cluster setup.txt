@@ -91,6 +91,20 @@ sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 	net.bridge.bridge-nf-call-ip6tables = 1
 	net.bridge.bridge-nf-call-iptables = 1
 
+ Load the new configuration with the command:
+
+	sysctl --system
+	
+4.6 Disable Swap.
+
+	sudo swapoff -a
+	
+ open the fstab for editing with the command:
+
+	sudo nano /etc/fstab
+	
+In that file comment out (add a # character at the beginning of a line) the line that begins with:
+	/dev/mapper/cl-swap
 
 ####Follow the below steps on master node only  ##
 
