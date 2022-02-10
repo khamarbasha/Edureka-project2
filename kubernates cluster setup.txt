@@ -2,7 +2,7 @@
 
 1.1. create docker repo
 
-vi /etc/yum.repo.d/docker-ce.repo
+vi /etc/yum.repos.d/docker-ce.repo
 
 	[docker-ce-stable]
 	name=Docker CE Stable - $basearch
