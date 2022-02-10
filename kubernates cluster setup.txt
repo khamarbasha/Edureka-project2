@@ -1,0 +1,123 @@
+1.install Docker 
+
+1.1. create docker repo
+
+vi /etc/yum.repo.d/docker-ce.repo
+
+	[docker-ce-stable]
+	name=Docker CE Stable - $basearch
+	baseurl=https://download.docker.com/linux/centos/$releasever/$basearch/stable
+	enabled=1
+	gpgchech=1
+	gpgkey=https://download.docker.com/linux/centos/gpg
+
+1.2 install docker using command
+
+	yum install docker-ce docker-ce-cli containerd.io --allowerasing
+
+1.3. create docker daemon & change cgroup driver
+
+vi /etc/docker/daemon.json
+
+	{
+	  "exec-opts": ["native.cgroupdriver=systemd"],
+	  "log-driver": "json-file",
+	  "log-opts": {
+	    "max-size": "100m"
+	  },
+	  "storage-driver": "overlay2",
+	  "storage-opts": [
+	    "overlay2.override_kernel_check=true"
+	  ]
+	}
+
+1.4. Create a new systemd directory with the command:
+
+	mkdir -p /etc/systemd/system/docker.service.d
+
+1.5. Reload and restart the Docker daemon with the commands:
+
+	systemctl daemon-reload
+	systemctl restart docker
+
+
+2. set the hostnames and edit hosts file
+
+	sudo hostnamectl set-hostname HOSTNAME
+	exec bash # to refresh bash
+
+3.add ip to hostname mapping 
+
+vi /etc/hosts
+
+kubemaster 10.10.10.3
+kubeslave1 10.10.10.1
+kubeslave2 10.10.10.2
+
+4. install kubernates
+
+4.1. create a new repository file.
+
+	vi nano /etc/yum.repos.d/kubernetes.repo
+
+	[kubernetes]
+	name=Kubernetes
+	baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+	enabled=1
+	gpgcheck=1
+	repo_gpgcheck=1
+	gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+
+
+4.2 Set SELinux in permissive mode (effectively disabling it)
+
+sudo setenforce 0
+sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+
+
+4.3 Install the necessary Kubernetes packages.
+
+	sudo dnf install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+
+
+4.4 Start and enable the service with the command:
+
+	sudo systemctl enable --now kubelet
+
+4.5 create a new file to help configure iptables.
+
+	vi /etc/sysctl.d/k8s.conf
+
+	net.bridge.bridge-nf-call-ip6tables = 1
+	net.bridge.bridge-nf-call-iptables = 1
+
+
+####Follow the below steps on master node only  ##
+
+4.6 insitilize k8s control manager and api server & master creating cluster
+
+	sudo kubeadm init --apiserver-advertise-address=<local-ip-address> --pod-network-cidr=192.168.0.0/16(any IP pool)
+
+4.7 To start using your cluster, you need to run the following as a regular user:
+
+	mkdir -p $HOME/.kube
+	sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+	sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+	# Note down the join tocken and used to join worker nodes in cluster.
+
+4.8 You should now deploy a Pod network to the cluster
+
+	curl https://docs.projectcalico.org/manifests/calico.yaml -o
+	kubectl apply -f calico.yaml
+
+4.9 check the status of  master node 
+
+	kubectl get nodes -o wide
+
+
+
+
+
+
+
