@@ -58,7 +58,7 @@ kubeslave2 10.10.10.2
 
 4.1. create a new repository file.
 
-	vi nano /etc/yum.repos.d/kubernetes.repo
+	vi /etc/yum.repos.d/kubernetes.repo
 
 	[kubernetes]
 	name=Kubernetes
